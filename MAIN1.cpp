@@ -9,6 +9,7 @@
 #define SCREENWIDTH 1600
 #define SCREENHEIGHT 900
 #define PI 3.1415926535897932384626433832795
+#define FPS 60
 
 //base shapes
 void drawRectangle(int x, int y, int w, int h);
@@ -22,7 +23,8 @@ void triangle(float x, float y, float l);
 void sky();
 void ground();
 void mountain();
-void clouds();
+void clouds(int xPosition);
+void background();
 void redApple(int x, int y);
 void greenApple(int x, int y);
 void drawTable(int x, int y);
@@ -33,16 +35,24 @@ void drawPinnochio(float x, float y, float width, float height, float speedX, fl
 
 void display();
 void initGL();
+void timer(int);
+
+float cloudXposition = 0.0;
+int cloudState = 1;
 
 int main(int argc, char** argv) {
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+
     glutInitWindowSize(SCREENWIDTH, SCREENHEIGHT);
-    glutCreateWindow("Apple");
+    glutCreateWindow("CG Project");
+
     glutDisplayFunc(display);
+    glutTimerFunc(1000, timer, 0);
 
     initGL();
-
+    
+    //Start the main loop
     glutMainLoop();
 }
 
@@ -51,10 +61,7 @@ void display() {
     glPointSize(10.0);
     glLineWidth(4.0);
 
-    sky();
-    mountain();
-    ground();
-    clouds();
+    background();
     appleStall(350, 100);
     person(1350, 200, 150);
 
@@ -68,6 +75,32 @@ void initGL() {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(0, SCREENWIDTH, 0, SCREENHEIGHT);
+}
+
+void timer(int) {
+    glutPostRedisplay();
+    glutTimerFunc(1000 / FPS, timer, 0);
+
+    switch (cloudState) {
+        case 1: 
+            if (cloudXposition <= (1600 - SCREENWIDTH * 6 / 7)) {
+                cloudXposition += 0.5;
+            }
+            else {
+                cloudState = 2;
+            }
+            break;
+        case 2: 
+            if (cloudXposition >= -(SCREENWIDTH / 6)) {
+                cloudXposition -= 0.5;
+            }
+            else {
+                cloudState = 1;
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 void drawRectangle(int x, int y, int w, int h) {
@@ -148,19 +181,26 @@ void mountain() {
     triangle(SCREENWIDTH * 7 / 8, SCREENHEIGHT / 6, SCREENHEIGHT / 2);
 }
 
-void clouds() {
+void clouds(int xPosition) {
     glColor3ub(236, 240, 241);
-    circle(SCREENWIDTH / 6, SCREENHEIGHT * 3 / 4, 50);
-    circle(SCREENWIDTH / 6 + 60, SCREENHEIGHT * 3 / 4 + 20, 70);
-    circle(SCREENWIDTH / 6 + 120, SCREENHEIGHT * 3 / 4, 45);
+    circle(xPosition + (SCREENWIDTH / 6), SCREENHEIGHT * 3 / 4, 50);
+    circle(xPosition + (SCREENWIDTH / 6 + 60), SCREENHEIGHT * 3 / 4 + 20, 70);
+    circle(xPosition + (SCREENWIDTH / 6 + 120), SCREENHEIGHT * 3 / 4, 45);
 
-    circle(SCREENWIDTH * 3 / 6, SCREENHEIGHT * 6 / 7, 50);
-    circle(SCREENWIDTH * 3 / 6 + 60, SCREENHEIGHT * 6 / 7 + 20, 70);
-    circle(SCREENWIDTH * 3 / 6 + 120, SCREENHEIGHT * 6 / 7, 45);
+    circle(xPosition + (SCREENWIDTH * 3 / 6), SCREENHEIGHT * 6 / 7, 50);
+    circle(xPosition + (SCREENWIDTH * 3 / 6 + 60), SCREENHEIGHT * 6 / 7 + 20, 70);
+    circle(xPosition + (SCREENWIDTH * 3 / 6 + 120), SCREENHEIGHT * 6 / 7, 45);
 
-    circle(SCREENWIDTH * 5 / 6, SCREENHEIGHT * 5 / 7, 50);
-    circle(SCREENWIDTH * 5 / 6 + 60, SCREENHEIGHT * 5 / 7 + 20, 70);
-    circle(SCREENWIDTH * 5 / 6 + 120, SCREENHEIGHT * 5 / 7, 45);
+    circle(xPosition + (SCREENWIDTH * 5 / 6), SCREENHEIGHT * 5 / 7, 50);
+    circle(xPosition + (SCREENWIDTH * 5 / 6 + 60), SCREENHEIGHT * 5 / 7 + 20, 70);
+    circle(xPosition + (SCREENWIDTH * 5 / 6 + 120), SCREENHEIGHT * 5 / 7, 45);
+}
+
+void background() {
+    sky();
+    mountain();
+    ground();
+    clouds(cloudXposition);
 }
 
 void redApple(int x, int y) {
@@ -285,9 +325,7 @@ void person(int x, int y, int w) {
     drawRectangle(x + (w * 2) / 3, y - h / 2, w / 4, h / 2);
 }
 
-void drawPinnochio(float x, float y, float width, float height, float speedX, float speedY, float scale, float nose_length)
-{
-
+void drawPinnochio(float x, float y, float width, float height, float speedX, float speedY, float scale, float nose_length) {
     //hat
     glBegin(GL_POLYGON);
     glColor3f(0.8f, 0.2f, 0.2f);
@@ -329,8 +367,6 @@ void drawPinnochio(float x, float y, float width, float height, float speedX, fl
     glVertex2i(scale * (x)+speedX, scale * (y + 20) + speedY);
     glEnd();
 
-
-
     //face
     glBegin(GL_POLYGON);
     glColor3f(0.95f, 0.75f, 0.6f);
@@ -347,7 +383,6 @@ void drawPinnochio(float x, float y, float width, float height, float speedX, fl
     glVertex2i(scale * (x)+speedX, scale * (y - 80) + speedY);
     glVertex2i(scale * (x + 120) + speedX, scale * (y - 80) + speedY);
     glEnd();
-
 
     //hair
     glBegin(GL_POLYGON);
@@ -392,7 +427,6 @@ void drawPinnochio(float x, float y, float width, float height, float speedX, fl
     glVertex2i(scale * (x + 50) + speedX, scale * (y - 50) + speedY);
     glEnd();
 
-
     //eyeball
     glBegin(GL_POLYGON);
     glColor3f(0.6f, 0.75f, 0.9f);
@@ -425,8 +459,6 @@ void drawPinnochio(float x, float y, float width, float height, float speedX, fl
     glVertex2i(scale * (x + 20) + speedX, scale * (y - 50) + speedY);
     glVertex2i(scale * (x + 10) + speedX, scale * (y - 50) + speedY);
     glEnd();
-
-
 
     //body
     glBegin(GL_POLYGON);
@@ -486,6 +518,4 @@ void drawPinnochio(float x, float y, float width, float height, float speedX, fl
     glVertex2i(scale * (x + 100 - 90) + speedX, scale * (y - 180) + speedY);
     glVertex2i(scale * x + speedX, scale * (y - 180) + speedY);
     glEnd();
-
-
 }
