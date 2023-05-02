@@ -6,8 +6,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-
-
 const int SCREEN_WIDTH = 1600;
 const int SCREEN_HEIGHT = 900;
 #define FPS  30
@@ -20,7 +18,6 @@ float word_enlarge = 0;
 int dx = 10; //speed of x
 int dy = 10; //speed of y
 float scaleFactor = 2;
-
 
 void init() 
 {
@@ -39,7 +36,6 @@ void init()
 
 void drawPinnochio(float x, float y, float width, float height, float speedX, float speedY, float scale, float nose_length, float nose_width)
 {
-
     //hat
     glBegin(GL_POLYGON);
     glColor3f(0.8f, 0.2f, 0.2f);
@@ -81,8 +77,6 @@ void drawPinnochio(float x, float y, float width, float height, float speedX, fl
     glVertex2i(scale * (x) + speedX, scale * (y + 20) + speedY);
     glEnd();
 
-
-
     //face
     glBegin(GL_POLYGON);
     glColor3f(0.95f, 0.75f, 0.6f);
@@ -99,7 +93,6 @@ void drawPinnochio(float x, float y, float width, float height, float speedX, fl
     glVertex2i(scale * (x) + speedX, scale * (y - 80) + speedY);
     glVertex2i(scale * (x + 120) + speedX, scale * (y - 80) + speedY);
     glEnd();
-
 
     //hair
     glBegin(GL_POLYGON);
@@ -134,7 +127,6 @@ void drawPinnochio(float x, float y, float width, float height, float speedX, fl
     glVertex2i(scale * (x + 80) + speedX, scale * (y - 50) + speedY);
     glVertex2i(scale * (x + 50) + speedX, scale * (y - 50) + speedY);
     glEnd();
-
 
     //eyeball
     glBegin(GL_POLYGON);
