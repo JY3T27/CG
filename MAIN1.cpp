@@ -14,6 +14,7 @@
 //base shapes
 void drawRectangle(int x, int y, int w, int h);
 void rectangle(int x, int y, int w, int h);
+void oval(int x, int y, float rX, float rY);
 void circle(int x, int y, float r);
 void halfCircle(float x, float y, float r);
 void lines(float x1, float y1, float x2, float y2);
@@ -32,6 +33,7 @@ void appleStall(int x, int y);
 void guard(float x, float y);
 void person(int x, int y, int w);
 void drawPinnochio(float x, float y, float width, float height, float speedX, float speedY, float scale, float nose_length);
+void light(int x, int y, int w, int h);
 
 void display();
 void initGL();
@@ -39,6 +41,7 @@ void timer(int);
 
 float cloudXposition = 0.0;
 int cloudState = 1;
+float lightYposition = 1600;
 
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
@@ -63,7 +66,8 @@ void display() {
 
     background();
     appleStall(350, 100);
-    person(1350, 200, 150);
+    //person(1350, 200, 150);
+    light(700, 500, 250, 800);
 
     glEnd();
     glFlush();
@@ -122,6 +126,18 @@ void rectangle(int x, int y, int w, int h) {
     glVertex2i(x - w2, y + h2);
     glVertex2i(x + w2, y + h2);
     glVertex2i(x + w2, y - h2);
+    glEnd();
+}
+
+void oval(int x, int y, float rX, float rY) {
+    float x1 = (float)x;
+    float y1 = (float)y;
+    float n = 50;
+    float inc = (2 * PI) / n;
+    glBegin(GL_POLYGON);
+    for (float theta = 0.0; theta <= 2 * PI; theta += inc) {
+        glVertex2f(rX * cos(theta) + x1, rY * sin(theta) + y1);
+    }
     glEnd();
 }
 
@@ -518,4 +534,12 @@ void drawPinnochio(float x, float y, float width, float height, float speedX, fl
     glVertex2i(scale * (x + 100 - 90) + speedX, scale * (y - 180) + speedY);
     glVertex2i(scale * x + speedX, scale * (y - 180) + speedY);
     glEnd();
+}
+
+void light(int x, int y, int w, int h) {
+    glColor3ub(255, 255, 224);
+    rectangle(x, y, w, h);
+
+    glColor3ub(255, 201, 100);
+    oval(x, y - (h/2), w / 2, 50);
 }
