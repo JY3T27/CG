@@ -10,6 +10,9 @@
 #define SCREENHEIGHT 900
 #define PI 3.1415926535897932384626433832795
 #define FPS 60
+#define cloudSpeed 0.5
+#define lightSpeed 10
+#define gravity 50
 
 //base shapes
 void drawRectangle(int x, int y, int w, int h);
@@ -32,8 +35,9 @@ void drawTable(int x, int y);
 void appleStall(int x, int y);
 void guard(float x, float y);
 void person(int x, int y, int w);
-void drawPinnochio(float x, float y, float width, float height, float speedX, float speedY, float scale, float nose_length);
+void pinnochio(float x, float y, float width, float height, float speedX, float speedY, float scale, float nose_length);
 void light(int x, int y, int w, int h);
+void drawLightShadow(int x, int y, int w, int h);
 
 void display();
 void initGL();
@@ -42,6 +46,11 @@ void timer(int);
 float cloudXposition = 0.0;
 int cloudState = 1;
 float lightYposition = 1600;
+float pinnoYposition = 1600;
+int timer1 = 0;
+
+bool lightReachGround = false;
+bool pinnoReachGround = false;
 
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
@@ -67,7 +76,12 @@ void display() {
     background();
     appleStall(350, 100);
     //person(1350, 200, 150);
-    light(700, 500, 250, 800);
+    light(700, lightYposition, 250, 800);
+    if (lightReachGround != false) {
+        drawLightShadow(700, lightYposition, 250, 800);
+    }
+    //glScalef(-1.0, 1.0, 1.0);
+    pinnochio(650, pinnoYposition, 100.0f, 50.0f, 0, 0, 1, 0);
 
     glEnd();
     glFlush();
@@ -88,7 +102,7 @@ void timer(int) {
     switch (cloudState) {
         case 1: 
             if (cloudXposition <= (1600 - SCREENWIDTH * 6 / 7)) {
-                cloudXposition += 0.5;
+                cloudXposition += cloudSpeed;
             }
             else {
                 cloudState = 2;
@@ -96,7 +110,7 @@ void timer(int) {
             break;
         case 2: 
             if (cloudXposition >= -(SCREENWIDTH / 6)) {
-                cloudXposition -= 0.5;
+                cloudXposition -= cloudSpeed;
             }
             else {
                 cloudState = 1;
@@ -105,6 +119,39 @@ void timer(int) {
         default:
             break;
     }
+
+    if (pinnoReachGround == false && lightReachGround == false && lightYposition > 500) {
+        lightYposition -= lightSpeed;
+    }
+    if (pinnoReachGround == false && lightReachGround == false && lightYposition == 500)
+    {
+        lightYposition = 500;
+        lightReachGround = true;
+    }
+
+    if (lightReachGround != false && pinnoYposition >= 350) {
+        pinnoYposition -= gravity;
+    }
+    if (pinnoYposition == 350)
+    {
+        pinnoReachGround = true;
+    }
+    if (lightReachGround != false && pinnoReachGround != false && timer1 < 100) {
+        timer1 += 1;
+    }
+
+    if (timer1 == 100) {
+        lightReachGround = false;
+    }
+
+    if (pinnoReachGround != false && lightReachGround == false && lightYposition < 1600) {
+        lightYposition += lightSpeed;
+    }
+    if (pinnoReachGround != false && lightReachGround == false && lightYposition == 1600)
+    {
+        lightYposition = 1600;
+    }
+
 }
 
 void drawRectangle(int x, int y, int w, int h) {
@@ -341,7 +388,7 @@ void person(int x, int y, int w) {
     drawRectangle(x + (w * 2) / 3, y - h / 2, w / 4, h / 2);
 }
 
-void drawPinnochio(float x, float y, float width, float height, float speedX, float speedY, float scale, float nose_length) {
+void pinnochio(float x, float y, float width, float height, float speedX, float speedY, float scale, float nose_length) {
     //hat
     glBegin(GL_POLYGON);
     glColor3f(0.8f, 0.2f, 0.2f);
@@ -539,7 +586,9 @@ void drawPinnochio(float x, float y, float width, float height, float speedX, fl
 void light(int x, int y, int w, int h) {
     glColor3ub(255, 255, 224);
     rectangle(x, y, w, h);
+}
 
+void drawLightShadow(int x, int y, int w, int h) {
     glColor3ub(255, 201, 100);
-    oval(x, y - (h/2), w / 2, 50);
+    oval(x, y - (h / 2), w / 2, 50);
 }
