@@ -83,7 +83,7 @@ void display() {
         drawLightShadow(700, lightYposition, 250, 800);
     }
     //glScalef(-1.0, 1.0, 1.0);
-    pinnochio(650, pinnoYposition, 100.0f, 50.0f, 0, 0, 1, 0);
+    pinnochio(-750, pinnoYposition, 100.0f, 50.0f, 0, 0, scale_x, scale_y, 0);
 
     glEnd();
     glFlush();
