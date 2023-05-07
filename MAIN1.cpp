@@ -275,17 +275,17 @@ void sky() {
 }
 
 void ground() {
-    glColor3ub(124, 252, 0);
+    glColor3ub(92, 64, 51);
     rectangle(SCREENWIDTH / 2, SCREENHEIGHT / 10, SCREENWIDTH, SCREENHEIGHT / 5);
 }
 
 void mountain() {
-    glColor3ub(35, 144, 79);
-    triangle(SCREENWIDTH * 3 / 7, SCREENHEIGHT / 6, SCREENHEIGHT / 2);
-    glColor3ub(30, 196, 100);
+    glColor3ub(21, 134, 10);
+    triangle(SCREENWIDTH * 3 / 7, SCREENHEIGHT / 8, SCREENHEIGHT / 2);
+    glColor3ub(32, 111, 24);
     triangle(SCREENWIDTH / 8, SCREENHEIGHT / 6, SCREENHEIGHT / 2);
-    glColor3ub(30, 196, 100);
-    triangle(SCREENWIDTH * 7 / 8, SCREENHEIGHT / 6, SCREENHEIGHT / 2);
+    glColor3ub(63, 140, 56);
+    triangle(SCREENWIDTH * 7 / 8, SCREENHEIGHT / 7, SCREENHEIGHT / 2);
 }
 
 void clouds(int xPosition) {
@@ -326,7 +326,7 @@ void greenApple(int x, int y) {
 
 void drawTable(int x, int y) {
     //table base
-    glColor3ub(150, 75, 0);
+    glColor3ub(100, 9, 9);
     rectangle(x, y + 100, 350, 150);
 
     //banner holder(left)
