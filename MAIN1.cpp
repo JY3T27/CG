@@ -91,7 +91,6 @@ void display() {
     
     pinnochio(pinnoXposition, pinnoYposition, 100.0f, 50.0f, pinnoXmove, pinnoYmove, pinnoXScale, 1, 0);
 
-    glEnd();
     glFlush();
     glutSwapBuffers();
 }
