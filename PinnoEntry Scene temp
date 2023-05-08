@@ -1,0 +1,517 @@
+#include <stdio.h>
+#include <windows.h>
+#include <stdlib.h>
+#include <gl/gl.h>
+#include <gl/glu.h>
+#include <gl/glut.h>
+#include <math.h>
+
+#define SCREENWIDTH 1600
+#define SCREENHEIGHT 900
+#define PI 3.1415926535897932384626433832795
+#define FPS 60
+#define cloudSpeed 0.5
+#define lightSpeed 3
+#define gravity 50
+#define movementSpeed 5
+
+//base shapes
+void drawRectangle(int x, int y, int w, int h);
+void rectangle(int x, int y, int w, int h);
+void oval(int x, int y, float rX, float rY);
+void circle(int x, int y, float r);
+void halfCircle(float x, float y, float r);
+void lines(float x1, float y1, float x2, float y2);
+void triangle(float x, float y, float l);
+
+//forming objects 
+void sky();
+void ground();
+void mountain();
+void clouds(int xPosition);
+void background();
+void pinnochio(float x, float y, float width, float height, float speedX, float speedY, float scaleX, float scaleY, float nose_length); void light(int x, int y, int w, int h);
+void drawLightShadow(int x, int y, int w, int h);
+
+void display();
+void initGL();
+void timer(int);
+int pinnoScaleFunction(bool pinnoFposition);
+
+float cloudXposition = 0.0;
+int cloudState = 1;
+float lightXposition = 0;
+float pinnoXposition = 650;
+float pinnoYposition = 1600;
+int pinnoXScale;
+float pinnoXmove = 0.0;
+float pinnoYmove = 0.0;
+int timer1 = 0;
+int timer2 = 0;
+int timer3 = 0;
+int timer4 = 0;
+
+bool lightReachGround = false;
+bool pinnoReachGround = false;
+bool pinnoFposition = false; //false = facing left
+bool pinnoMovingLeft = false;
+bool pinnoMovingRight = false;
+
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+
+    glutInitWindowSize(SCREENWIDTH, SCREENHEIGHT);
+    glutCreateWindow("CG Project");
+
+    glutDisplayFunc(display);
+    glutTimerFunc(1000, timer, 0);
+
+    initGL();
+
+    //Start the main loop
+    glutMainLoop();
+}
+
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glPointSize(10.0);
+    glLineWidth(4.0);
+
+    background();
+    light(700, 500, lightXposition, 800);
+    drawLightShadow(700, 100, lightXposition, 800);
+
+    pinnoXScale = pinnoScaleFunction(pinnoFposition);
+    pinnochio(pinnoXposition, pinnoYposition, 100.0f, 50.0f, pinnoXmove, pinnoYmove, pinnoXScale, 1, 0);
+
+    glFlush();
+    glutSwapBuffers();
+}
+
+void initGL() {
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, SCREENWIDTH, 0, SCREENHEIGHT);
+}
+
+void timer(int) {
+    glutPostRedisplay();
+    glutTimerFunc(1000 / FPS, timer, 0);
+
+    switch (cloudState) {
+    case 1:
+        if (cloudXposition <= (1600 - SCREENWIDTH * 6 / 7)) {
+            cloudXposition += cloudSpeed;
+        }
+        else {
+            cloudState = 2;
+        }
+        break;
+    case 2:
+        if (cloudXposition >= -(SCREENWIDTH / 6)) {
+            cloudXposition -= cloudSpeed;
+        }
+        else {
+            cloudState = 1;
+        }
+        break;
+    default:
+        break;
+    }
+
+    //light opening 
+    if (pinnoReachGround == false && lightReachGround == false && lightXposition < 250) {
+        lightXposition += lightSpeed;
+    }
+    if (pinnoReachGround == false && lightReachGround == false && lightXposition >= 250) {
+        lightXposition = 250;
+        lightReachGround = true;
+    }
+    //pinno falling down from sky
+    if (lightReachGround != false && pinnoYposition > 300) {
+        pinnoYposition -= gravity;
+    }
+    if (pinnoYposition <= 300) {
+        pinnoReachGround = true;
+    }
+    //putting the time for the scene to stay 
+    if (lightReachGround != false && pinnoReachGround != false && timer1 < 500) {
+        timer1 += 1;
+    }
+    if (timer1 == 500) {
+        lightReachGround = false;
+    }
+    //light starting to close 
+    if (pinnoReachGround != false && lightReachGround == false && lightXposition > 0) {
+        lightXposition -= lightSpeed;
+    }
+    if (pinnoReachGround != false && lightReachGround == false && lightXposition <= 0) {
+        lightXposition = 0;
+    }
+    if (pinnoReachGround != false && timer2 < 250) {
+        timer2 += 1;
+    }
+    if (timer2 == 75) {
+        pinnoFposition = true;
+    }
+    if (timer2 == 130) {
+        pinnoFposition = false;
+    }
+    if (timer2 >= 185 && timer2 <= 250) {
+        pinnoFposition = true;
+        pinnoMovingLeft = true;
+    }
+    if (pinnoFposition != false && pinnoMovingLeft != false && pinnoXmove < 400.0) {
+        pinnoXmove += movementSpeed;
+    }
+    if (pinnoFposition != false && pinnoMovingLeft != false && pinnoXmove >= 400.0) {
+        pinnoXmove = 400;
+        pinnoMovingLeft = false;
+    }
+    if (pinnoXmove == 400 && pinnoMovingLeft == false && timer3 < 100) {
+        timer3 += 1;
+    }
+    if (timer3 >= 100) {
+        timer3 = 100;
+        pinnoFposition = false;
+        pinnoMovingRight = true;
+    }
+    if (pinnoFposition == false && pinnoMovingRight != false && pinnoXmove > -400.0) {
+        pinnoXmove -= movementSpeed;
+    }
+    if (pinnoFposition == false && pinnoMovingRight != false && pinnoXmove <= -400.0) {
+        pinnoXmove = -400.0;
+        pinnoMovingRight = false;
+    }
+}
+
+int pinnoScaleFunction(bool pinnoFp) {
+    if (pinnoFp == false) {
+        pinnoXposition = 650;
+        return 1;
+    }
+    else {
+        pinnoXposition = -750;
+        return -1;
+    }
+}
+
+void drawRectangle(int x, int y, int w, int h) {
+    int w1 = x + w;
+    int h1 = y + h;
+    glBegin(GL_POLYGON);
+    glVertex2d(x, y);
+    glVertex2d(w1, y);
+    glVertex2d(w1, h1);
+    glVertex2d(x, h1);
+    glEnd();
+}
+
+void rectangle(int x, int y, int w, int h) {
+    int w2 = w / 2;
+    int h2 = h / 2;
+    glBegin(GL_QUADS);
+    glVertex2i(x - w2, y - h2);
+    glVertex2i(x - w2, y + h2);
+    glVertex2i(x + w2, y + h2);
+    glVertex2i(x + w2, y - h2);
+    glEnd();
+}
+
+void oval(int x, int y, float rX, float rY) {
+    float x1 = (float)x;
+    float y1 = (float)y;
+    float n = 50;
+    float inc = (2 * PI) / n;
+    glBegin(GL_POLYGON);
+    for (float theta = 0.0; theta <= 2 * PI; theta += inc) {
+        glVertex2f(rX * cos(theta) + x1, rY * sin(theta) + y1);
+    }
+    glEnd();
+}
+
+void circle(int x, int y, float r) {
+    float x1 = (float)x;
+    float y1 = (float)y;
+    float n = 50;
+    float inc = (2 * PI) / n;
+    glBegin(GL_POLYGON);
+    for (float theta = 0.0; theta <= 2 * PI; theta += inc) {
+        glVertex2d(r * cos(theta) + x1, r * sin(theta) + y1);
+    }
+    glEnd();
+}
+
+void halfCircle(float x, float y, float r) {
+    float n = 50;
+    float inc = PI / n;
+    glBegin(GL_POLYGON);
+    for (float theta = 0.0; theta <= PI; theta += inc) {
+        glVertex2d(r * cos(theta) + x, r * sin(theta) + y);
+    }
+    glEnd();
+}
+
+void lines(float x1, float y1, float x2, float y2) {
+    glBegin(GL_LINES);
+    glVertex2d(x1, y1);
+    glVertex2d(x2, y2);
+    glEnd();
+}
+
+void triangle(float x, float y, float l) {
+    glBegin(GL_TRIANGLES);
+    glVertex2f(x - l, y);
+    glVertex2f(x + l, y);
+    glVertex2f(x, y + l);
+    glEnd();
+}
+
+void sky() {
+    glColor3ub(4, 4, 52);
+    rectangle(SCREENWIDTH / 2, SCREENHEIGHT * 6 / 10, SCREENWIDTH, SCREENHEIGHT * 4 / 5);
+}
+
+void ground() {
+    glColor3ub(92, 64, 51);
+    rectangle(SCREENWIDTH / 2, SCREENHEIGHT / 10, SCREENWIDTH, SCREENHEIGHT / 5);
+}
+
+void mountain() {
+    glColor3ub(21, 134, 10);
+    triangle(SCREENWIDTH * 3 / 7, SCREENHEIGHT / 8, SCREENHEIGHT / 2);
+    glColor3ub(32, 111, 24);
+    triangle(SCREENWIDTH / 8, SCREENHEIGHT / 6, SCREENHEIGHT / 2);
+    glColor3ub(63, 140, 56);
+    triangle(SCREENWIDTH * 7 / 8, SCREENHEIGHT / 7, SCREENHEIGHT / 2);
+}
+
+void clouds(int xPosition) {
+    glColor3ub(60, 60, 76);
+    circle(xPosition + (SCREENWIDTH / 6), SCREENHEIGHT * 3 / 4, 50);
+    circle(xPosition + (SCREENWIDTH / 6 + 60), SCREENHEIGHT * 3 / 4 + 20, 70);
+    circle(xPosition + (SCREENWIDTH / 6 + 120), SCREENHEIGHT * 3 / 4, 45);
+
+    circle(xPosition + (SCREENWIDTH * 3 / 6), SCREENHEIGHT * 6 / 7, 50);
+    circle(xPosition + (SCREENWIDTH * 3 / 6 + 60), SCREENHEIGHT * 6 / 7 + 20, 70);
+    circle(xPosition + (SCREENWIDTH * 3 / 6 + 120), SCREENHEIGHT * 6 / 7, 45);
+
+    circle(xPosition + (SCREENWIDTH * 5 / 6), SCREENHEIGHT * 5 / 7, 50);
+    circle(xPosition + (SCREENWIDTH * 5 / 6 + 60), SCREENHEIGHT * 5 / 7 + 20, 70);
+    circle(xPosition + (SCREENWIDTH * 5 / 6 + 120), SCREENHEIGHT * 5 / 7, 45);
+}
+
+void background() {
+    sky();
+    mountain();
+    ground();
+    clouds(cloudXposition);
+}
+
+void pinnochio(float x, float y, float width, float height, float speedX, float speedY, float scaleX, float scaleY, float nose_length)
+{
+    //hat
+    glBegin(GL_POLYGON);
+    glColor3f(0.8f, 0.2f, 0.2f);
+    glVertex2i(scaleX * (x + 5) + speedX, scaleY * (y + 100) + speedY);
+    glVertex2i(scaleX * (x + 20) + speedX, scaleY * (y + 100) + speedY);
+    glVertex2i(scaleX * (x + 20) + speedX, scaleY * (y + 80) + speedY);
+    glVertex2i(scaleX * (x + 5) + speedX, scaleY * (y + 80) + speedY);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glColor3f(0.8f, 0.2f, 0.2f);
+    glVertex2i(scaleX * (x + 20) + speedX, scaleY * (y + 80) + speedY);
+    glVertex2i(scaleX * (x + 60) + speedX, scaleY * (y + 80) + speedY);
+    glVertex2i(scaleX * (x + 60) + speedX, scaleY * (y + 60) + speedY);
+    glVertex2i(scaleX * (x + 20) + speedX, scaleY * (y + 60) + speedY);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glColor3f(0.9f, 0.9f, 0.5f);
+    glVertex2i(scaleX * (x + 40) + speedX, scaleY * (y + 60) + speedY);
+    glVertex2i(scaleX * (x + 80) + speedX, scaleY * (y + 60) + speedY);
+    glVertex2i(scaleX * (x + 80) + speedX, scaleY * (y + 40) + speedY);
+    glVertex2i(scaleX * (x + 40) + speedX, scaleY * (y + 40) + speedY);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glColor3f(0.7f, 0.7f, 0.7f);
+    glVertex2i(scaleX * (x + 20) + speedX, scaleY * (y + 40) + speedY);
+    glVertex2i(scaleX * (x + 100) + speedX, scaleY * (y + 40) + speedY);
+    glVertex2i(scaleX * (x + 100) + speedX, scaleY * (y + 20) + speedY);
+    glVertex2i(scaleX * (x + 20) + speedX, scaleY * (y + 20) + speedY);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glColor3f(0.9f, 0.9f, 0.5f);
+    glVertex2i(scaleX * (x)+speedX, scaleY * (y)+speedY);
+    glVertex2i(scaleX * (x + 120) + speedX, scaleY * (y)+speedY);
+    glVertex2i(scaleX * (x + 120) + speedX, scaleY * (y + 20) + speedY);
+    glVertex2i(scaleX * (x)+speedX, scaleY * (y + 20) + speedY);
+    glEnd();
+
+    //face
+    glBegin(GL_POLYGON);
+    glColor3f(0.95f, 0.75f, 0.6f);
+    glVertex2i(scaleX * (x + 100) + speedX, scaleY * (y - 80) + speedY);
+    glVertex2i(scaleX * (x)+speedX, scaleY * (y - 80) + speedY);
+    glVertex2i(scaleX * (x)+speedX, scaleY * (y - 100) + speedY);
+    glVertex2i(scaleX * (x + 100) + speedX, scaleY * (y - 100) + speedY);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glColor3f(0.95f, 0.75f, 0.6f);
+    glVertex2i(scaleX * (x + 120) + speedX, scaleY * (y)+speedY);
+    glVertex2i(scaleX * (x)+speedX, scaleY * (y)+speedY);
+    glVertex2i(scaleX * (x)+speedX, scaleY * (y - 80) + speedY);
+    glVertex2i(scaleX * (x + 120) + speedX, scaleY * (y - 80) + speedY);
+    glEnd();
+
+    //hair
+    glBegin(GL_POLYGON);
+    glColor3f(0.0f, 0.0f, 0.0f);
+    glVertex2i(scaleX * (x + 120) + speedX, scaleY * (y - 0) + speedY);
+    glVertex2i(scaleX * (x + 0) + speedX, scaleY * (y - 0) + speedY);
+    glVertex2i(scaleX * (x + 0) + speedX, scaleY * (y - 20) + speedY);
+    glVertex2i(scaleX * (x + 120) + speedX, scaleY * (y - 20) + speedY);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glColor3f(0.0f, 0.0f, 0.0f);
+    glVertex2i(scaleX * (x + 100) + speedX, scaleY * (y - 20) + speedY);
+    glVertex2i(scaleX * (x + 120) + speedX, scaleY * (y - 20) + speedY);
+    glVertex2i(scaleX * (x + 120) + speedX, scaleY * (y - 40) + speedY);
+    glVertex2i(scaleX * (x + 100) + speedX, scaleY * (y - 40) + speedY);
+    glEnd();
+
+    //nose
+    glBegin(GL_POLYGON);
+    glColor3f(1.0f, 0.5f, 0.0f);
+    glVertex2i(scaleX * (x - 40 + nose_length) + speedX, scaleY * (y - 80) + speedY);
+    glVertex2i(scaleX * (x + 40) + speedX, scaleY * (y - 80) + speedY);
+    glVertex2i(scaleX * (x + 40) + speedX, scaleY * (y - 60) + speedY);
+    glVertex2i(scaleX * (x - 40 + nose_length) + speedX, scaleY * (y - 60) + speedY);
+    glEnd();
+
+    //eyes
+    glBegin(GL_POLYGON);
+    glColor3f(0.3f, 0.3f, 0.3f);
+    glVertex2i(scaleX * (x + 10) + speedX, scaleY * (y - 30) + speedY);
+    glVertex2i(scaleX * (x + 40) + speedX, scaleY * (y - 30) + speedY);
+    glVertex2i(scaleX * (x + 40) + speedX, scaleY * (y - 50) + speedY);
+    glVertex2i(scaleX * (x + 10) + speedX, scaleY * (y - 50) + speedY);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glColor3f(0.3f, 0.3f, 0.3f);
+    glVertex2i(scaleX * (x + 50) + speedX, scaleY * (y - 30) + speedY);
+    glVertex2i(scaleX * (x + 80) + speedX, scaleY * (y - 30) + speedY);
+    glVertex2i(scaleX * (x + 80) + speedX, scaleY * (y - 50) + speedY);
+    glVertex2i(scaleX * (x + 50) + speedX, scaleY * (y - 50) + speedY);
+    glEnd();
+
+    //eyeball
+    glBegin(GL_POLYGON);
+    glColor3f(0.6f, 0.75f, 0.9f);
+    glVertex2i(scaleX * (x + 50) + speedX, scaleY * (y - 35) + speedY);
+    glVertex2i(scaleX * (x + 70) + speedX, scaleY * (y - 35) + speedY);
+    glVertex2i(scaleX * (x + 70) + speedX, scaleY * (y - 50) + speedY);
+    glVertex2i(scaleX * (x + 50) + speedX, scaleY * (y - 50) + speedY);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glColor3f(0.6f, 0.75f, 0.9f);
+    glVertex2i(scaleX * (x + 10) + speedX, scaleY * (y - 35) + speedY);
+    glVertex2i(scaleX * (x + 30) + speedX, scaleY * (y - 35) + speedY);
+    glVertex2i(scaleX * (x + 30) + speedX, scaleY * (y - 50) + speedY);
+    glVertex2i(scaleX * (x + 10) + speedX, scaleY * (y - 50) + speedY);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glColor3f(0.2f, 0.2f, 0.2f);
+    glVertex2i(scaleX * (x + 50) + speedX, scaleY * (y - 40) + speedY);
+    glVertex2i(scaleX * (x + 60) + speedX, scaleY * (y - 40) + speedY);
+    glVertex2i(scaleX * (x + 60) + speedX, scaleY * (y - 50) + speedY);
+    glVertex2i(scaleX * (x + 50) + speedX, scaleY * (y - 50) + speedY);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glColor3f(0.2f, 0.2f, 0.2f);
+    glVertex2i(scaleX * (x + 10) + speedX, scaleY * (y - 40) + speedY);
+    glVertex2i(scaleX * (x + 20) + speedX, scaleY * (y - 40) + speedY);
+    glVertex2i(scaleX * (x + 20) + speedX, scaleY * (y - 50) + speedY);
+    glVertex2i(scaleX * (x + 10) + speedX, scaleY * (y - 50) + speedY);
+    glEnd();
+
+    //body
+    glBegin(GL_POLYGON);
+    glColor3f(0.9f, 0.9f, 0.5f);
+    glVertex2i(scaleX * (x + 100) + speedX, scaleY * (y - 100) + speedY);
+    glVertex2i(scaleX * x + speedX, scaleY * (y - 100) + speedY);
+    glVertex2i(scaleX * x + speedX, scaleY * (y - 180) + speedY);
+    glVertex2i(scaleX * (x + 100) + speedX, scaleY * (y - 180) + speedY);
+    glEnd();
+
+    //pants
+    glBegin(GL_POLYGON);
+    glColor3f(0.8f, 0.2f, 0.2f);
+    glVertex2i(scaleX * (x + 100) + speedX, scaleY * (y - 130) + speedY);
+    glVertex2i(scaleX * x + speedX, scaleY * (y - 130) + speedY);
+    glVertex2i(scaleX * x + speedX, scaleY * (y - 180) + speedY);
+    glVertex2i(scaleX * (x + 100) + speedX, scaleY * (y - 180) + speedY);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glColor3f(0.8f, 0.2f, 0.2f);
+    glVertex2i(scaleX * (x + 35) + speedX, scaleY * (y - 100) + speedY);
+    glVertex2i(scaleX * (x + 15) + speedX, scaleY * (y - 100) + speedY);
+    glVertex2i(scaleX * (x + 15) + speedX, scaleY * (y - 180) + speedY);
+    glVertex2i(scaleX * (x + 35) + speedX, scaleY * (y - 180) + speedY);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glColor3f(0.8f, 0.2f, 0.2f);
+    glVertex2i(scaleX * (x + 70) + speedX, scaleY * (y - 100) + speedY);
+    glVertex2i(scaleX * (x + 50) + speedX, scaleY * (y - 100) + speedY);
+    glVertex2i(scaleX * (x + 50) + speedX, scaleY * (y - 180) + speedY);
+    glVertex2i(scaleX * (x + 70) + speedX, scaleY * (y - 180) + speedY);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glColor3f(0.8f, 0.2f, 0.2f);
+    glVertex2i(scaleX * x + speedX, scaleY * (y - 180) + speedY);
+    glVertex2i(scaleX * (x + 100) + speedX, scaleY * (y - 180) + speedY);
+    glVertex2i(scaleX * (x + 100) + speedX, scaleY * (y - 200) + speedY);
+    glVertex2i(scaleX * x + speedX, scaleY * (y - 200) + speedY);
+    glEnd();
+
+    //vest
+    glBegin(GL_POLYGON);
+    glColor3f(0.2f, 0.2f, 0.2f);
+    glVertex2i(scaleX * (x + 75) + speedX, scaleY * (y - 100) + speedY);
+    glVertex2i(scaleX * (x + 100) + speedX, scaleY * (y - 100) + speedY);
+    glVertex2i(scaleX * (x + 100) + speedX, scaleY * (y - 180) + speedY);
+    glVertex2i(scaleX * (x + 75) + speedX, scaleY * (y - 180) + speedY);
+    glEnd();
+
+    glBegin(GL_POLYGON);
+    glColor3f(0.2f, 0.2f, 0.2f);
+    glVertex2i(scaleX * x + speedX, scaleY * (y - 100) + speedY);
+    glVertex2i(scaleX * (x + 100 - 90) + speedX, scaleY * (y - 100) + speedY);
+    glVertex2i(scaleX * (x + 100 - 90) + speedX, scaleY * (y - 180) + speedY);
+    glVertex2i(scaleX * x + speedX, scaleY * (y - 180) + speedY);
+    glEnd();
+}
+
+void light(int x, int y, int w, int h) {
+    glColor3ub(255, 255, 224);
+    rectangle(x, y, w, h);
+}
+
+void drawLightShadow(int x, int y, int w, int h) {
+    glColor3ub(255, 201, 100);
+    oval(x, y, w / 2, 50);
+}
