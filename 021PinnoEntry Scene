@@ -185,6 +185,10 @@ void timer(int) {
         pinnoXmove = -400.0;
         pinnoMovingRight = false;
     }
+    if (lightXposition == 0 && pinnoXmove >-1600)
+    {
+        pinnoXmove -= 2;
+    }
 }
 
 int pinnoScaleFunction(bool pinnoFp) {
