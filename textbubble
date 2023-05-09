@@ -1,0 +1,137 @@
+void drawTextBubble(float position_x, float position_y, float ScaleX, float ScaleY) {
+    //left wall 
+    glColor3f(0.0, 0.0, 0.0);
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 280 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 280 + position_x, ScaleY * 120 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 290 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 290 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 280 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 100 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 280 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 90 + position_y);
+    glVertex2f(ScaleX * 280 + position_x, ScaleY * 80 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 90 + position_y);
+    glVertex2f(ScaleX * 310 + position_x, ScaleY * 90 + position_y);
+    glVertex2f(ScaleX * 310 + position_x, ScaleY * 80 + position_y);
+    glVertex2f(ScaleX * 280 + position_x, ScaleY * 80 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 90 + position_y);
+    glVertex2f(ScaleX * 310 + position_x, ScaleY * 90 + position_y);
+    glVertex2f(ScaleX * 310 + position_x, ScaleY * 80 + position_y);
+    glVertex2f(ScaleX * 280 + position_x, ScaleY * 80 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 310 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 320 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 320 + position_x, ScaleY * 90 + position_y);
+    glVertex2f(ScaleX * 310 + position_x, ScaleY * 90 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 320 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 330 + position_x, ScaleY * 110 + position_y);
+    glVertex2f(ScaleX * 330 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 320 + position_x, ScaleY * 100 + position_y);
+    glEnd();
+
+    //bottom wall
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 320 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 110 + position_y);
+    glVertex2f(ScaleX * 330 + position_x, ScaleY * 110 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 130 + position_y);
+    glVertex2f(ScaleX * 540 + position_x, ScaleY * 130 + position_y);
+    glVertex2f(ScaleX * 540 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 120 + position_y);
+    glEnd();
+
+    //right wall
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 540 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 550 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 550 + position_x, ScaleY * 130 + position_y);
+    glVertex2f(ScaleX * 540 + position_x, ScaleY * 130 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 290 + position_y);
+    glVertex2f(ScaleX * 540 + position_x, ScaleY * 290 + position_y);
+    glVertex2f(ScaleX * 540 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 280 + position_y);
+    glEnd();
+
+    //top wall
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 300 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 300 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 290 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 290 + position_y);
+    glEnd();
+
+    //inner filling
+    glColor3f(1.0, 1.0, 1.0);
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 290 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 290 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 120 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 320 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 320 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 100 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 310 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 310 + position_x, ScaleY * 90 + position_y);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 90 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 120 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 540 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 540 + position_x, ScaleY * 130 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 130 + position_y);
+    glEnd();
+
+
+
+}
