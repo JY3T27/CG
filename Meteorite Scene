@@ -1,0 +1,88 @@
+#include <windows.h>
+#include <stdlib.h>
+#include <gl\gl.h>
+#include <gl\glu.h>
+#include <gl\glut.h>
+
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 800
+#define FPS 30
+
+int X = SCREEN_WIDTH;
+int Y = SCREEN_HEIGHT;
+int dx = 12;
+int dy = 15;
+int meteoSize = 50;
+int ds = 3;
+
+void triangle(int x, int y, int s) {
+	glBegin(GL_POLYGON);
+	glVertex2i(x, y);
+	glVertex2i(x + s, y);
+	glVertex2i(x + s / 2, y + s);
+	glEnd();
+}
+
+void meteorite(int x, int y, int s) {
+	glBegin(GL_POLYGON);
+	glColor3ub(255, 149, 5);
+	glVertex2i(x, y);
+	glVertex2i(x + s * 0.3, y - s * 0.15);
+	glVertex2i(x + s * 1.5, y);
+	// 7 dots tail
+	glVertex2i(x + s * 3, y + s / 2);
+	glVertex2i(x + s * 2, y + s / 1.6);
+	glVertex2i(x + s * 3.3, y + s * 1.3);
+	glVertex2i(x + s * 2.2, y + s * 1.3);
+	glVertex2i(x + s * 2.8, y + s * 2.1);
+	glVertex2i(x + s * 1.4, y + s * 1.4);
+	glVertex2i(x + s * 1.5, y + s * 2.05);
+
+	glVertex2i(x + s / 3, y + s);
+	glVertex2i(x + s * 0.02, y + s * 0.3);
+	glEnd();
+}
+
+void display() {
+	glClear(GL_COLOR_BUFFER_BIT);
+	meteorite(X, Y, meteoSize);
+
+	glFlush();
+}
+
+void idle() {
+	DWORD start = GetTickCount64();
+	while (GetTickCount64() - start < 1000 / FPS);
+	X -= dx;
+	Y -= dy;
+	meteoSize += ds;
+	
+	if (Y < 0) {
+		glClearColor(255, 255, 255, 0);
+		X *= dx;
+		Y *= dy;
+	}
+	//if (X<0 || X>SCREEN_WIDTH) dx *= -1;
+	//if (Y<0 || Y>SCREEN_HEIGHT) dy *= -1;
+
+	glutPostRedisplay();
+}
+
+void initGL() {
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT);
+}
+
+int main(int argc, char** argv) {
+
+	glutInit(&argc, argv);
+	glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	glutCreateWindow("Meteorite");
+	glutDisplayFunc(display);
+	glutIdleFunc(idle);
+
+	initGL();
+	glutMainLoop();
+}
