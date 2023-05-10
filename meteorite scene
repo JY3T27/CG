@@ -15,14 +15,6 @@ int dy = 15;
 int meteoSize = 50;
 int ds = 3;
 
-void triangle(int x, int y, int s) {
-	glBegin(GL_POLYGON);
-	glVertex2i(x, y);
-	glVertex2i(x + s, y);
-	glVertex2i(x + s / 2, y + s);
-	glEnd();
-}
-
 void meteorite(int x, int y, int s) {
 	glBegin(GL_POLYGON);
 	glColor3ub(255, 149, 5);
@@ -57,14 +49,13 @@ void idle() {
 	Y -= dy;
 	meteoSize += ds;
 	
+	//for blankscreen after impact
 	if (Y < 0) {
 		glClearColor(255, 255, 255, 0);
 		X *= dx;
 		Y *= dy;
 	}
-	//if (X<0 || X>SCREEN_WIDTH) dx *= -1;
-	//if (Y<0 || Y>SCREEN_HEIGHT) dy *= -1;
-
+	
 	glutPostRedisplay();
 }
 
