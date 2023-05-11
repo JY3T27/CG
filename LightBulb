@@ -1,0 +1,90 @@
+#include <stdio.h>
+#include <windows.h>
+#include <stdlib.h>
+#include <gl/gl.h>
+#include <gl/glu.h>
+#include <gl/glut.h>
+#include <math.h>
+
+#define SCREENWIDTH 1600
+#define SCREENHEIGHT 900
+#define PI 3.1415926535897932384626433832795
+
+void circle(float x, float y, float r) {
+    float x1 = (float)x;
+    float y1 = (float)y;
+    float n = 50;
+    float inc = (2 * PI) / n;
+    glBegin(GL_POLYGON);
+    for (float theta = 0.0; theta <= 2 * PI; theta += inc) {
+        glVertex2d(r * cos(theta) + x1, r * sin(theta) + y1);
+    }
+    glEnd();
+}
+
+void lightBulb(float x, float y) {
+    glColor3f(1.0f, 1.0f, 0.0f);
+    circle(65, 123, 30);
+    glBegin(GL_POLYGON);
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glVertex2i(x,y + 10);
+    glVertex2i(x + 30, y + 10);
+    glVertex2i(x + 30, y + 45);
+    glVertex2i(x, y + 45);
+    glEnd();
+
+    //left light
+    glBegin(GL_POLYGON);
+    glColor3f(1.0f, 1.0f, 0.0f);
+    glVertex2i(x - 30, y + 90);
+    glVertex2i(x - 37, y + 125);
+    glVertex2i(x - 5, y + 108);
+    glEnd();
+
+    //mid light
+    glBegin(GL_POLYGON);
+    glColor3f(1.0f, 1.0f, 0.0f);
+    glVertex2i(x + 0, y + 110);
+    glVertex2i(x + 15, y + 145);
+    glVertex2i(x + 30 , y + 110);
+    glEnd();
+
+    //right light
+    glBegin(GL_POLYGON);
+    glColor3f(1.0f, 1.0f, 0.0f);
+    glVertex2i(x + 35, y + 108);
+    glVertex2i(x + 65, y + 125);
+    glVertex2i(x + 60, y + 90);
+}
+
+void initGL() {
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, SCREENWIDTH, 0, SCREENHEIGHT);
+}
+
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glPointSize(10.0);
+    glLineWidth(4.0);
+
+    lightBulb(50,50);
+
+    glFlush();
+    glutSwapBuffers();
+}
+
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+
+    glutInitWindowSize(SCREENWIDTH, SCREENHEIGHT);
+    glutCreateWindow("CG Project");
+
+    glutDisplayFunc(display);
+    initGL();
+
+    //Start the main loop
+    glutMainLoop();
+}
