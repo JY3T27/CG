@@ -12,6 +12,9 @@
 #define FPS 60
 #define cloudSpeed 0.5
 #define movementSpeed 5
+#define time 5
+#define flyingSpeed 4
+#define DEG_TO_RADIAN (PI/180)
 
 //base shapes
 void drawRectangle(int x, int y, int w, int h);
@@ -33,12 +36,22 @@ void redApple(int x, int y);
 void greenApple(int x, int y);
 void drawTable(int x, int y);
 void appleStall(int x, int y);
-void person(int x, int y, int w);
+void person(int x, int y, int w, bool throwMotion);
+void drawTextBubble(float position_x, float position_y, float ScaleX, float ScaleY);
+void questionMark(float x, float y, float scale);
+void cash(float x, float y, float cashAngle);
 
 void display();
 void initGL();
 void timer(int);
+void idle();
 int pinnoScaleFunction(bool pinnoFposition);
+void print(int x, int y, const char* text);
+void showText1(int x, int y);
+void showText2(int x, int y);
+void cashFly(float x, float y, float cashAngle, float cashDx);
+void appleFly(float x, float y, float appleAngle);
+void showText4(int x, int y);
 
 float cloudXposition = 0.0;
 int cloudState = 1;
@@ -46,13 +59,38 @@ float pinnoXposition = 650;
 float pinnoYposition = 300;
 int pinnoXScale = 1;
 int pinnoYScale = 1;
-int personXposition = 2500;
+int personXposition = 2200;
 int personYposition = 170;
+float cashAngle = 0.0f;
+float cashDx = 0.0f;
+float appleAngle = 0.0f;
+const char* text1 = "APPLE STORE";
+const char* text2 = "RM 5";
+const char* text3 = "5";
+const char* text4 = "Thank youuuuuuuu";
 
-bool personReachP = false;
+int timer1 = 0;
+int timer2 = 0;
+int timer3 = 0;
+int timer4 = 0;
+int timer5 = 0;
+int timer6 = 0;
+int timer7 = 0;
+int timer8 = 0;
+int timer9 = 0;
+int timer10 = 0;
+int timer11 = 0;
+
+bool text1show = false;
+bool text2show = false;
+bool text4show = false;
 bool pinnoFposition = true; //false = facing left
 bool personMovingLeft = false;
 bool personMovingRight = false;
+bool throwMotion = false;
+bool moneyShow = false;
+bool appleRposition = true;
+bool personWalkAway = false;
 
 int main(int argc, char** argv) {
     glutInit(&argc, argv);
@@ -62,6 +100,7 @@ int main(int argc, char** argv) {
     glutCreateWindow("CG Project");
 
     glutDisplayFunc(display);
+    glutIdleFunc(idle);
     glutTimerFunc(1000, timer, 0);
 
     initGL();
@@ -77,11 +116,32 @@ void display() {
 
     background();
     appleStall(350, 100);
+    
 
     pinnoXScale = pinnoScaleFunction(pinnoFposition);
     pinnochio(pinnoXposition, pinnoYposition, 100.0, 50.0f, 0, 0, pinnoXScale, pinnoYScale, 0);
 
-    person(personXposition, personYposition, 110);
+    person(personXposition, personYposition, 110, throwMotion);
+
+    if (text1show == true) {
+        showText1(950, 350);
+    }
+
+    if (text2show == true) {
+        showText2(500, 350);
+    }
+
+    if (moneyShow == true) {
+        cashFly(1150, 250, cashAngle, cashDx);
+    }
+
+    if (appleRposition == true) {
+        appleFly(465, 300, appleAngle);
+    }
+    
+    if (text4show == true) {
+        showText4(950, 350);
+    }
 
     glFlush();
     glutSwapBuffers();
@@ -89,7 +149,7 @@ void display() {
 
 void initGL() {
     glClearColor(0.0, 0.0, 0.0, 0.0);
-    glMatrixMode(GL_PROJECTION);
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluOrtho2D(0, SCREENWIDTH, 0, SCREENHEIGHT);
 }
@@ -118,15 +178,86 @@ void timer(int) {
     default:
         break;
     }
+}
 
-    if (personReachP == false && personXposition > 1200) {
+void idle() {
+    DWORD start = GetTickCount64();
+    while (GetTickCount64() - start < 1000 / FPS);
+
+    if (timer1 == 0 && text1show == false && personXposition > 1100) {
         personXposition -= movementSpeed;
     }
-    if (personReachP == false && personXposition  <=1200) {
-        personXposition = 1200;
-        personReachP = true;
+    if (personXposition <= 1100) {
+        personXposition = 1100;
+        timer1 += time;
     }
 
+    if (timer1 >= 100 && timer1 < 400) {
+        text1show = true;
+    }
+    else if (timer1 >= 400 && timer1 < 600) {
+        text1show = false;
+    }
+    else if (timer1 >= 600 && timer1 < 900) {
+        text2show = true;
+    }
+    else if (timer1 >= 900 && timer1 < 1100) {
+        text2show = false;
+    }
+    else if (timer1 >= 1100 && timer1 < 1300) {
+        throwMotion = true;
+        moneyShow = true;
+    }
+    else if (timer1 >= 1300 && timer1 < 1500) {
+        throwMotion = false;
+        moneyShow = true;
+    }
+    else {
+        timer1 = timer1;
+    }
+
+    if (moneyShow == true) {
+        cashAngle += 5.0f;
+        cashDx += flyingSpeed;
+    }
+
+    if (cashDx == 400) {
+        moneyShow = false;
+        pinnoFposition = false;
+    }
+
+    if (appleRposition == true && cashDx == 400) {
+        appleAngle += 1.0f;
+    }
+
+    if (appleAngle >= 60.0f && appleAngle < 180.0f) {
+        pinnoFposition = true;
+    } 
+    if (appleAngle == 180.0f) {
+        pinnoFposition = true;
+        appleRposition = false;
+        appleAngle = 180.0f;
+        timer2 += time;
+    }
+
+    if (timer2 >= 100 && timer2 < 400) {
+        text4show = true;
+    }
+    else if (timer2 >= 400 && timer2 < 600) {
+        text4show = false;
+        personWalkAway = true;
+    }
+    else {
+        timer2 = timer2;
+    }
+    
+    if (personWalkAway == true && personXposition < 2000) {
+        personXposition += (2 * movementSpeed);
+    }
+    if (personWalkAway == true && personXposition >= 2000) {
+        personXposition = 2000;
+        personWalkAway = false;
+    }
 }
 
 int pinnoScaleFunction(bool pinnoFp) {
@@ -138,6 +269,47 @@ int pinnoScaleFunction(bool pinnoFp) {
         pinnoXposition = -750;
         return -1;
     }
+}
+
+void print(int x, int y, const char* text) {
+    glRasterPos2f(x, y);
+    for (int i = 0; text[i] != '\0'; i++) {
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, text[i]);
+    }
+}
+
+void showText1(int x, int y) {
+    drawTextBubble(x, y, 1, 1);
+    greenApple(x + 370, y + 200);
+    questionMark(x + 460, y + 200, 1.15);
+}
+
+void showText2(int x, int y) {
+    drawTextBubble(x, y, 1, 1);
+    glColor3ub(0, 0, 0);
+    print(x + 350, y + 200, text2);
+}
+
+void cashFly(float x, float y, float cashAngle, float cashDx) {
+    glPushMatrix();
+    glTranslatef(-cashDx, 0.0f, 0.0f);
+    cash(x, y, cashAngle);
+    glPopMatrix();
+}
+
+void appleFly(float x, float y, float appleAngle) {
+    glPushMatrix();
+    glTranslatef(x + 350, y, 0.0f);
+    glRotatef(-appleAngle, 0.0f, 0.0f, 1.0f);
+    glTranslatef(-(x + 350), -y, 0.0f);
+    greenApple(x, y);
+    glPopMatrix();
+}
+
+void showText4(int x, int y) {
+    drawTextBubble(x, y, 1, 1);
+    glColor3ub(0, 0, 0);
+    print(x + 30, y + 200, text4);
 }
 
 void drawRectangle(int x, int y, int w, int h) {
@@ -252,8 +424,7 @@ void background() {
     clouds(cloudXposition);
 }
 
-void pinnochio(float x, float y, float width, float height, float speedX, float speedY, float scaleX, float scaleY, float nose_length)
-{
+void pinnochio(float x, float y, float width, float height, float speedX, float speedY, float scaleX, float scaleY, float nose_length) {
     //hat
     glBegin(GL_POLYGON);
     glColor3f(0.8f, 0.2f, 0.2f);
@@ -478,6 +649,157 @@ void drawTable(int x, int y) {
     //banner
     glColor3ub(255, 255, 255);
     rectangle(x, y + 350, 400, 50);
+
+    glColor3ub(0, 0, 0);
+    print(x - 75, y + 340, text1);
+}
+
+void drawTextBubble(float position_x, float position_y, float ScaleX, float ScaleY) {
+    //left wall 
+    glColor3ub(255, 255, 255);
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 280 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 280 + position_x, ScaleY * 120 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 290 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 290 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 280 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 100 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 280 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 90 + position_y);
+    glVertex2f(ScaleX * 280 + position_x, ScaleY * 80 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 90 + position_y);
+    glVertex2f(ScaleX * 310 + position_x, ScaleY * 90 + position_y);
+    glVertex2f(ScaleX * 310 + position_x, ScaleY * 80 + position_y);
+    glVertex2f(ScaleX * 280 + position_x, ScaleY * 80 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 90 + position_y);
+    glVertex2f(ScaleX * 310 + position_x, ScaleY * 90 + position_y);
+    glVertex2f(ScaleX * 310 + position_x, ScaleY * 80 + position_y);
+    glVertex2f(ScaleX * 280 + position_x, ScaleY * 80 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 310 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 320 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 320 + position_x, ScaleY * 90 + position_y);
+    glVertex2f(ScaleX * 310 + position_x, ScaleY * 90 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 320 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 330 + position_x, ScaleY * 110 + position_y);
+    glVertex2f(ScaleX * 330 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 320 + position_x, ScaleY * 100 + position_y);
+    glEnd();
+
+    //bottom wall
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 320 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 110 + position_y);
+    glVertex2f(ScaleX * 330 + position_x, ScaleY * 110 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 130 + position_y);
+    glVertex2f(ScaleX * 540 + position_x, ScaleY * 130 + position_y);
+    glVertex2f(ScaleX * 540 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 120 + position_y);
+    glEnd();
+
+    //right wall
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 540 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 550 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 550 + position_x, ScaleY * 130 + position_y);
+    glVertex2f(ScaleX * 540 + position_x, ScaleY * 130 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 290 + position_y);
+    glVertex2f(ScaleX * 540 + position_x, ScaleY * 290 + position_y);
+    glVertex2f(ScaleX * 540 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 280 + position_y);
+    glEnd();
+
+    //top wall
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 300 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 300 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 290 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 290 + position_y);
+    glEnd();
+
+    //inner filling
+    glColor3f(1.0, 1.0, 1.0);
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 290 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 290 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 120 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 320 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 320 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 100 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 310 + position_x, ScaleY * 100 + position_y);
+    glVertex2f(ScaleX * 310 + position_x, ScaleY * 90 + position_y);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 90 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 300 + position_x, ScaleY * 120 + position_y);
+    glVertex2f(ScaleX * 290 + position_x, ScaleY * 120 + position_y);
+    glEnd();
+
+    glBegin(GL_QUADS);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 540 + position_x, ScaleY * 280 + position_y);
+    glVertex2f(ScaleX * 540 + position_x, ScaleY * 130 + position_y);
+    glVertex2f(ScaleX * 530 + position_x, ScaleY * 130 + position_y);
+    glEnd();
+}
+
+void questionMark(float x, float y, float scale) {
+    glColor3ub(0, 0, 0);
+    rectangle(x - 25, y + 20, 7 * scale, 7 * 1.5 * scale);
+    rectangle(x - 17, y + 29, 7 * 1.5 * scale, 7 * scale);
+    rectangle(x - 7, y + 35, 7 * 2 * scale, 7 * scale);
+    rectangle(x + 5, y + 29, 7 * 1.5 * scale, 7 * scale);
+    rectangle(x + 13, y + 20, 7 * scale, 7 * 2 * scale);
+    rectangle(x + 7, y + 11, 7 * scale, 7 * 1.5 * scale);
+    rectangle(x + 1, y + 3, 7 * scale, 7 * 1.5 * scale);
+    rectangle(x - 4, y - 5, 7 * scale, 7 * 2 * scale);
+    rectangle(x - 4, y - 21, 7 * scale, 7 * scale);
 }
 
 void appleStall(int x, int y) {
@@ -485,10 +807,9 @@ void appleStall(int x, int y) {
     redApple(x - 115, y + 200);
     redApple(x - 50, y + 200);
     greenApple(x + 50, y + 200);
-    greenApple(x + 115, y + 200);
 }
 
-void person(int x, int y, int w) {
+void person(int x, int y, int w, bool throwMotion) {
     int h = 1.2 * w;
 
     //head
@@ -517,11 +838,19 @@ void person(int x, int y, int w) {
     drawRectangle(x + (w - w / 3), y, w / 3, h);
 
     //left hand
-    glColor3ub(255, 219, 172);
-    drawRectangle(x + w * 1.01, y, w / 4, h);
-    glColor3ub(80, 180, 255);
-    drawRectangle(x + w * 1.01, y + h / 3, w / 4, (h * 2) / 3);
-
+    if (throwMotion == false) { 
+        glColor3ub(255, 219, 172);
+        drawRectangle(x + w * 1.01, y, w / 4, h);
+        glColor3ub(80, 180, 255);
+        drawRectangle(x + w * 1.01, y + h / 3, w / 4, (h * 2) / 3);
+    }
+    else {
+        glColor3ub(255, 219, 172);
+        drawRectangle(x, y + w * 1.01, w, h / 4);
+        glColor3ub(80, 180, 255);
+        drawRectangle(x + h / 3, y + w * 1.01, (w * 2) / 3, h / 4);
+    }
+    
     //right hand
     glColor3ub(255, 219, 172);
     drawRectangle(x - (w / 4) * 1.01, y, w / 4, h);
@@ -532,4 +861,20 @@ void person(int x, int y, int w) {
     glColor3ub(165, 42, 42);
     drawRectangle(x + w / 6, y - h / 2, w / 4, h / 2);
     drawRectangle(x + (w * 2) / 3, y - h / 2, w / 4, h / 2);
+}
+
+void cash(float x, float y, float cashAngle) {
+    glPushMatrix();
+    glTranslatef(x, y, 0.0f);
+    glRotatef(cashAngle, 0.0f, 0.0f, 1.0f);
+    glTranslatef(-x, -y, 0.0f);
+    glColor3ub(0, 255, 0);
+    rectangle(x, y, 40, 35);
+    glColor3ub(0, 177, 64);
+    rectangle(x + 20, y, 15, 35);
+    rectangle(x - 20, y, 15, 35);
+    
+    glPopMatrix();
+    glColor3ub(0, 0, 0);
+    print(x - 5, y - 7, text3);
 }
