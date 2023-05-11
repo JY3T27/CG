@@ -14,7 +14,6 @@
 #define movementSpeed 5
 #define time 5
 #define flyingSpeed 4
-#define DEG_TO_RADIAN (PI/180)
 
 //base shapes
 void drawRectangle(int x, int y, int w, int h);
@@ -71,15 +70,6 @@ const char* text4 = "Thank youuuuuuuu";
 
 int timer1 = 0;
 int timer2 = 0;
-int timer3 = 0;
-int timer4 = 0;
-int timer5 = 0;
-int timer6 = 0;
-int timer7 = 0;
-int timer8 = 0;
-int timer9 = 0;
-int timer10 = 0;
-int timer11 = 0;
 
 bool text1show = false;
 bool text2show = false;
