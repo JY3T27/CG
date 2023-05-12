@@ -106,7 +106,7 @@ void display() {
 
     background();
     appleStall(350, 100);
-    
+
 
     pinnoXScale = pinnoScaleFunction(pinnoFposition);
     pinnochio(pinnoXposition, pinnoYposition, 100.0, 50.0f, 0, 0, pinnoXScale, pinnoYScale, 0);
@@ -128,7 +128,7 @@ void display() {
     if (appleRposition == true) {
         appleFly(465, 300, appleAngle);
     }
-    
+
     if (text4show == true) {
         showText4(950, 350);
     }
@@ -182,23 +182,23 @@ void idle() {
         timer1 += time;
     }
 
-    if (timer1 >= 100 && timer1 < 400) {
+    if (timer1 >= 100 && timer1 < 500) {
         text1show = true;
     }
-    else if (timer1 >= 400 && timer1 < 600) {
+    else if (timer1 >= 500 && timer1 < 700) {
         text1show = false;
     }
-    else if (timer1 >= 600 && timer1 < 900) {
+    else if (timer1 >= 700 && timer1 < 1100) {
         text2show = true;
     }
-    else if (timer1 >= 900 && timer1 < 1100) {
+    else if (timer1 >= 1100 && timer1 < 1200) {
         text2show = false;
     }
-    else if (timer1 >= 1100 && timer1 < 1300) {
+    else if (timer1 >= 1200 && timer1 < 1400) {
         throwMotion = true;
         moneyShow = true;
     }
-    else if (timer1 >= 1300 && timer1 < 1500) {
+    else if (timer1 >= 1400 && timer1 < 1600) {
         throwMotion = false;
         moneyShow = true;
     }
@@ -217,12 +217,12 @@ void idle() {
     }
 
     if (appleRposition == true && cashDx == 400) {
-        appleAngle += 1.0f;
+        appleAngle += 2.0f;
     }
 
     if (appleAngle >= 60.0f && appleAngle < 180.0f) {
         pinnoFposition = true;
-    } 
+    }
     if (appleAngle == 180.0f) {
         pinnoFposition = true;
         appleRposition = false;
@@ -240,7 +240,7 @@ void idle() {
     else {
         timer2 = timer2;
     }
-    
+
     if (personWalkAway == true && personXposition < 2000) {
         personXposition += (2 * movementSpeed);
     }
@@ -299,7 +299,7 @@ void appleFly(float x, float y, float appleAngle) {
 void showText4(int x, int y) {
     drawTextBubble(x, y, 1, 1);
     glColor3ub(0, 0, 0);
-    print(x + 30, y + 200, text4);
+    print(x + 300, y + 200, text4);
 }
 
 void drawRectangle(int x, int y, int w, int h) {
@@ -828,7 +828,7 @@ void person(int x, int y, int w, bool throwMotion) {
     drawRectangle(x + (w - w / 3), y, w / 3, h);
 
     //left hand
-    if (throwMotion == false) { 
+    if (throwMotion == false) {
         glColor3ub(255, 219, 172);
         drawRectangle(x + w * 1.01, y, w / 4, h);
         glColor3ub(80, 180, 255);
@@ -840,7 +840,7 @@ void person(int x, int y, int w, bool throwMotion) {
         glColor3ub(80, 180, 255);
         drawRectangle(x + h / 3, y + w * 1.01, (w * 2) / 3, h / 4);
     }
-    
+
     //right hand
     glColor3ub(255, 219, 172);
     drawRectangle(x - (w / 4) * 1.01, y, w / 4, h);
@@ -863,7 +863,7 @@ void cash(float x, float y, float cashAngle) {
     glColor3ub(0, 177, 64);
     rectangle(x + 20, y, 15, 35);
     rectangle(x - 20, y, 15, 35);
-    
+
     glPopMatrix();
     glColor3ub(0, 0, 0);
     print(x - 5, y - 7, text3);
