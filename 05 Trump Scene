@@ -234,13 +234,13 @@ void idle() {
     else if (timer2 >= 2400 && timer2 < 2600) {
         text3show = false;
     }
-    else if (timer2 >= 2600 && timer2 < 3000) {
+    else if (timer2 >= 2600 && timer2 < 2900) {
         noseL -= movementSpeed;
     }
-    else if (timer2 >= 3000 && timer2 < 3400) {
+    else if (timer2 >= 2900 && timer2 < 3200) {
         noseL += movementSpeed;
     }
-    else if (timer2 >= 3400 && timer2 < 3800) {
+    else if (timer2 >= 3200 && timer2 < 3600) {
         pointMotion = true;
     }
     else {
